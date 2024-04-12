@@ -1,0 +1,90 @@
+class Cliente:
+    def __init__(self, nome, cpf):
+        self.nome = nome
+        self.cpf = cpf
+
+class Conta:
+    def __init__(self, cliente, saldo=0):
+        self.cliente = cliente
+        self.saldo = saldo
+        self.historico = []
+
+    def depositar(self, valor):
+        self.saldo += valor
+        self.historico.append(f'Depósito de {valor}')
+
+    def sacar(self, valor):
+        if valor <= self.saldo:
+            self.saldo -= valor
+            self.historico.append(f'Saque de {valor}')
+        else:
+            print('Saldo insuficiente.')
+
+    def transferir(self, outra_conta, valor):
+        if valor <= self.saldo:
+            self.saldo -= valor
+            outra_conta.depositar(valor)
+            self.historico.append(f'Transferência de {valor} para conta de {outra_conta.cliente.nome}')
+        else:
+            print('Saldo insuficiente para transferência.')
+
+class HistoricoConta:
+    def __init__(self):
+        self.transacoes = []
+
+    def registrar_transacao(self, transacao):
+        self.transacoes.append(transacao)
+
+    def imprimir_extrato(self):
+        for transacao in self.transacoes:
+            print(transacao)
+
+def imprimir_informacoes(cliente, conta, historico_conta):
+    print(f"Cliente: {cliente.nome}, Conta: {conta.saldo}")
+    print(f"Histórico da Conta:")
+    historico_conta.imprimir_extrato()
+
+def cadastrar_cliente():
+    nome = input("Digite o nome do cliente: ")
+    cpf = input("Digite o CPF do cliente: ")
+    return Cliente(nome, cpf)
+
+def cadastrar_historico_conta():
+    return HistoricoConta()
+
+def menu_interativo():
+    cliente = cadastrar_cliente()
+    conta = Conta(cliente, 1000)
+    historico_conta = cadastrar_historico_conta()
+
+    while True:
+        print("\nMenu:")
+        print("1. Depositar")
+        print("2. Sacar")
+        print("3. Transferir")
+        print("4. Imprimir Extrato")
+        print("5. Sair")
+
+        escolha = input("Escolha uma opção (1-5): ")
+
+        if escolha == "1":
+            valor = float(input("Digite o valor a ser depositado: "))
+            conta.depositar(valor)
+            historico_conta.registrar_transacao(f'Depósito de {valor}')
+        elif escolha == "2":
+            valor = float(input("Digite o valor a ser sacado: "))
+            conta.sacar(valor)
+            historico_conta.registrar_transacao(f'Saque de {valor}')
+        elif escolha == "3":
+            valor = float(input("Digite o valor a ser transferido: "))
+            outra_conta = Conta(cadastrar_cliente(), 0)  
+            conta.transferir(outra_conta, valor)
+        elif escolha == "4":
+            imprimir_informacoes(cliente, conta, historico_conta)
+        elif escolha == "5":
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    menu_interativo()
